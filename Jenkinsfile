@@ -20,5 +20,24 @@ pipeline {
                 '''
             }
         }
+
+        stage('Build Docker Image') {
+            steps {
+                sh '''
+                docker build -t first-api-rest:latest first-api-rest
+                '''
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                sh '''
+                docker stop first-api-rest || true
+                docker rm first-api-rest || true
+
+                docker run -d -p 8080:8080 --name first-api-rest first-api-rest:latest
+                '''
+            }
+        }
     }
 }

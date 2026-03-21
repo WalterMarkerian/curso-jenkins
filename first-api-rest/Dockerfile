@@ -1,13 +1,7 @@
-FROM jenkins/jenkins:lts
+FROM eclipse-temurin:21-jdk
 
-USER root
+WORKDIR /app
 
-RUN apt-get update && \
-    apt-get install -y \
-        ca-certificates \
-        curl \
-        gnupg \
-        wget \
-        maven
+COPY target/*.jar app.jar
 
-USER jenkins
+ENTRYPOINT ["java","-jar","app.jar"]
