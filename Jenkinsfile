@@ -35,7 +35,7 @@ pipeline {
                 docker stop first-api-rest || true
                 docker rm first-api-rest || true
 
-                docker run -d -p 8080:8080 --name first-api-rest first-api-rest:latest
+                docker run -d -p 8081:8080 --name first-api-rest first-api-rest:latest
                 '''
             }
         }
