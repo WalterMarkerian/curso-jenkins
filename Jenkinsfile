@@ -1,42 +1,33 @@
 pipeline {
     agent any
 
-    stages {
+    environment {
+        IMAGE_NAME = "first-api-rest"
+        CONTAINER_NAME = "first-api-rest-container"
+    }
 
+    stages {
         stage('Checkout') {
             steps {
+                // Jenkins descargará el código de GitHub automáticamente
                 checkout scm
             }
         }
 
-        stage('Build con Maven en Docker') {
+        stage('Build Image') {
             steps {
-                sh '''
-                docker run --rm \
-                -v /var/lib/docker/volumes/jenkins_home/_data/workspace/jenkins-test-pipeline/first-api-rest:/app \
-                -w /app \
-                maven:3.9.9-eclipse-temurin-21 \
-                mvn clean install
-                '''
+                echo 'Construyendo la imagen Docker...'
+                // Usamos el Dockerfile que debe estar en tu repo
+                sh "docker build -t ${IMAGE_NAME}:latest ."
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Deploy') {
             steps {
-                sh '''
-                docker build -t first-api-rest:latest first-api-rest
-                '''
-            }
-        }
-
-        stage('Run Container') {
-            steps {
-                sh '''
-                docker stop first-api-rest || true
-                docker rm first-api-rest || true
-
-                docker run -d -p 8081:8080 --name first-api-rest first-api-rest:latest
-                '''
+                echo 'Desplegando en el puerto 8081...'
+                sh "docker stop ${CONTAINER_NAME} || true"
+                sh "docker rm ${CONTAINER_NAME} || true"
+                sh "docker run -d -p 8081:8080 --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest"
             }
         }
     }
